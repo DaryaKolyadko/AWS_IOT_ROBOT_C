@@ -30,7 +30,7 @@ Need a config file to be started. Content:
 - field size (width, height)
 - field (matrix)
 - initial position: [i, j]
-- initial direction (UP = 0, RIGHT = 1, DOWN = 2 ,LEFT = 3)
+- initial direction (UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3)
 
 Example:
 ```
