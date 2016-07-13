@@ -65,8 +65,8 @@ struct robotState currentRobotState;
 
 AWS_IoT_Client mqttClient;
 char certDirectory[PATH_MAX + 1] = "./certs";
-static char filename[PATH_MAX + 1] = "config.txt";
 char HostAddress[255] = AWS_IOT_MQTT_HOST;
+char filename[255];
 uint32_t port = AWS_IOT_MQTT_PORT;
 
 char* publishTopicName;
@@ -76,11 +76,6 @@ int qosLevel;
 
 bool checkNextStep() {
 	printField();
-	// IOT_INFO("at %d %d %s", currentPosition.i, currentPosition.j, direction_type_str[currentDirection]);
-	// IOT_INFO("shift %d %d", shiftList[currentDirection][0],  shiftList[currentDirection][1]);
-	// IOT_INFO("next [%d, %d] = %d", currentPosition.i + shiftList[currentDirection][0],
-						// currentPosition.j + shiftList[currentDirection][1], field.m[currentPosition.i + shiftList[currentDirection][0]]
-						// [currentPosition.j + shiftList[currentDirection][1]]);
 	struct position nextPosition;
 	nextPosition.i = currentPosition.i + shiftList[currentDirection][0];
 	nextPosition.j = currentPosition.j + shiftList[currentDirection][1];
@@ -128,8 +123,6 @@ void makeStep() {
 		strcat(res, fieldStr);
 		publishMessage(res);
 		free(res);
-		// publishMessage("I am going");
-		// publishMessage(getFieldAsString());
 }
 }
 
@@ -143,7 +136,7 @@ void turn(enum protocol where) {
 	} 
 }
 
-static bool readDataFromFile() {
+static bool readDataFromFile(char* filename) {
 	int i;
 	int j;
 	FILE *fp;
@@ -348,6 +341,10 @@ void parseInputArgsForConnectParams(int argc, char **argv) {
 			case 't':
 				strcpy(publishTopicName, optarg);
 				IOT_DEBUG("publish topic name: %s\n", optarg);
+				break;
+			case 'f':
+				strcpy(filename, optarg);
+				IOT_DEBUG("config file %s", optarg);
 				break;
 			case 's':
 				strcpy(subscribeTopicName, optarg);
@@ -576,7 +573,6 @@ bool connectToThingAndSubscribeToTopic(int argc, char **argv) {
 
 int main(int argc, char **argv) {
 	IoT_Error_t rc = FAILURE;
-	// IoT_Error_t rc1 = FAILURE;
 	parseInputArgsForConnectParams(argc, argv);
 
 	if (!readDataFromFile()) {
@@ -591,7 +587,6 @@ int main(int argc, char **argv) {
 			while (true) {
 				//Max time the yield function will wait for read messages
 				rc = aws_iot_mqtt_yield(&mqttClient, 1000);
-				// rc1 = aws_iot_shadow_yield(&mqttClient, 1000);
 
 				if (NETWORK_ATTEMPTING_RECONNECT == rc) { // || NETWORK_ATTEMPTING_RECONNECT == rc1) {
 				// If the client is attempting to reconnect we will skip the rest of the loop.
