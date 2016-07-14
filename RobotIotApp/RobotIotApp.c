@@ -66,7 +66,7 @@ struct robotState currentRobotState;
 AWS_IoT_Client mqttClient;
 char certDirectory[PATH_MAX + 1] = "./certs";
 char HostAddress[255] = AWS_IOT_MQTT_HOST;
-char filename[255];
+char filename[255] = "config.txt";
 uint32_t port = AWS_IOT_MQTT_PORT;
 
 char* publishTopicName;
@@ -136,7 +136,7 @@ void turn(enum protocol where) {
 	} 
 }
 
-static bool readDataFromFile(char* filename) {
+static bool readDataFromFile() {
 	int i;
 	int j;
 	FILE *fp;
@@ -576,7 +576,7 @@ int main(int argc, char **argv) {
 	parseInputArgsForConnectParams(argc, argv);
 
 	if (!readDataFromFile()) {
-		printf("%s not found. Robot cannot work without this configuration.\n", filename);
+		printf("Config file '%s' not found. Robot cannot work without configuration.\n", filename);
 		return -1;
 	} 
 	else {
